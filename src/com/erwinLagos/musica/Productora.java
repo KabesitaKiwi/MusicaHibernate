@@ -15,6 +15,10 @@ public class Productora {
     private String propietario;
     private List<Cancion> Canciones;
     private List<Album> albumes;
+    @Override
+    public String toString(){
+        return "Productora: " + nombre + " | Localizacion: " + localizacion + " | Trabajadores: " + trabajadores + " | Fecha fundación: " + fechaFundacion + " | Propietario " + propietario;
+    }
 
     @Id
     @Column(name = "idProductora")

@@ -14,6 +14,12 @@ public class Album {
     private Date fechaSalida;
     private Productora productora;
     private List<Cancion> canciones;
+    private Autor autor;
+
+    @Override
+    public String toString(){
+        return "Titulo " + titulo + " | Autor: " + autor.getNombreArtistico() + " | Nº Canciones: " + numeroCanciones + " | Duración: " + duracionMinutos + " | Feccha de Salida " + fechaSalida + " | Productora: " + productora.getNombre();
+    }
 
     @Id
     @Column(name = "idAlbum")
@@ -99,5 +105,15 @@ public class Album {
 
     public void setCanciones(List<Cancion> canciones) {
         this.canciones = canciones;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "idAutor", referencedColumnName = "idAutor", nullable = false)
+    public Autor getAutor() {
+        return autor;
+    }
+
+    public void setAutor(Autor autor) {
+        this.autor = autor;
     }
 }

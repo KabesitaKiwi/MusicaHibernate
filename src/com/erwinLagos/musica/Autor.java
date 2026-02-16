@@ -16,6 +16,11 @@ public class Autor {
     private boolean gira;
     private List<Cancion> canciones;
 
+    @Override
+    public String toString(){
+        return "Nombre Real " + nombreReal + " | Nombre Artistico: " + nombreArtistico + " | Edad: " + edad + " | Pais: " + pais + " | Fecha de Primera Publicacion " + fechaPrimeraPublicacion + " | De Gira: " + gira;
+    }
+
     @Id
     @Column(name = "idAutor")
     public int getIdAutor() {
@@ -113,4 +118,8 @@ public class Autor {
     public void setCanciones(List<Cancion> canciones) {
         this.canciones = canciones;
     }
+
+    @OneToMany(mappedBy = "autor")
+    private List<Album> albumes;
+
 }

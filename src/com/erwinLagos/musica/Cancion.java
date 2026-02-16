@@ -16,6 +16,10 @@ public class Cancion {
     private Autor autor;
     private Album album;
 
+    public String toString(){
+        return "Titulo: " + titulo + " | Album: " + album.getTitulo() + " | Autor: " + autor.getNombreArtistico() + " | Género " + genero + " | Productora " + productora.getNombre() + " | Nº Participantes " + participantes + " | duracion: " + duracion + " | Valoración " + idioma + " | Idioma: " + idioma;
+    }
+
     @Id
     @Column(name = "idCancion")
     public int getIdCancion() {
