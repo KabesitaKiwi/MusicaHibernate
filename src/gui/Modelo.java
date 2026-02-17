@@ -40,6 +40,8 @@ public class Modelo {
 
     }
 
+    //cargar Datos
+
     ArrayList<Productora> getProd(){
         Session sesion = sessionFactory.openSession();
         Query query = sesion.createQuery("FROM Productora");
@@ -71,5 +73,76 @@ public class Modelo {
         sesion.close();
         return listarAutor;
     }
+
+    //insertar datos
+    public boolean insertar(Object o){
+        try (Session sesion = sessionFactory.openSession()) {
+
+            sesion.beginTransaction();
+            sesion.save(o);
+            sesion.getTransaction().commit();
+            sesion.close();
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // eliminar
+    void eliminar(Object o){
+        Session sesion = sessionFactory.openSession();
+        sesion.beginTransaction();
+        sesion.delete(o);
+        sesion.getTransaction().commit();
+        sesion.close();
+    }
+
+    //modificar
+    void modificar(Object o){
+        Session sesion = sessionFactory.openSession();
+        sesion.beginTransaction();
+        sesion.saveOrUpdate(o);
+        sesion.getTransaction().commit();
+        sesion.close();
+    }
+
+    //verificar
+    public boolean existeProductora(String nombre) {
+        try (Session sesion = sessionFactory.openSession()) {
+            Query<Integer> q = sesion.createQuery(
+                    "select 1 from Productora where lower(trim(nombre) ) = :nombre", Integer.class
+            );
+            q.setParameter("nombre", nombre);
+            q.setMaxResults(1);
+            return q.uniqueResult() != null;
+        }
+    }
+
+    public boolean existeAutor(String nombre){
+        try (Session sesion = sessionFactory.openSession()) {
+            Query<Integer> q = sesion.createQuery(
+                    "select 1 from Autor where lower(trim(nombreArtistico) ) = :nombre", Integer.class
+            );
+            q.setParameter("nombre", nombre);
+            q.setMaxResults(1);
+            return q.uniqueResult() != null;
+        }
+    }
+
+    public boolean existeAlbumPorAutor(int idAutor, String titulo) {
+        try (Session sesion = sessionFactory.openSession()) {
+            Query<Integer> q = sesion.createQuery(
+                    "select 1 from Album a where a.autor.idAutor = :idAutor and a.titulo = :titulo",
+                    Integer.class
+            );
+            q.setParameter("idAutor", idAutor);
+            q.setParameter("titulo", titulo);
+            q.setMaxResults(1);
+            return q.uniqueResult() != null;
+        }
+    }
+
+
 
 }
