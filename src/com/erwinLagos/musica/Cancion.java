@@ -17,7 +17,7 @@ public class Cancion {
     private Album album;
 
     public String toString(){
-        return "Titulo: " + titulo + " | Album: " + album.getTitulo() + " | Autor: " + autor.getNombreArtistico() + " | Género " + genero + " | Productora " + productora.getNombre() + " | Nº Participantes " + participantes + " | duracion: " + duracion + " | Valoración " + idioma + " | Idioma: " + idioma;
+        return "Titulo: " + titulo + " | Album: " + album.getTitulo() + " | Autor: " + autor.getNombreArtistico() + " | Género " + genero + " | Productora " + productora.getNombre() + " | Nº Participantes " + participantes + " | duracion: " + duracion + " | Valoración: " + valoracion + " | Idioma: " + idioma;
     }
 
     @Id

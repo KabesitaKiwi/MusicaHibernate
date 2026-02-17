@@ -101,7 +101,6 @@ public class Vista extends JFrame{
     public void initFrame() {
         this.setContentPane(panel1);
 
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.pack();
 
         this.setSize(new Dimension(this.getWidth()+100,this.getHeight()));
@@ -113,6 +112,7 @@ public class Vista extends JFrame{
         crearModelos();
         //cargo Enums
         setEnumComboBox();
+        itemDesconectar.setEnabled(false);
     }
 
 

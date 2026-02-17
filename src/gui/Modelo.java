@@ -99,12 +99,18 @@ public class Modelo {
     }
 
     //modificar
-    void modificar(Object o){
-        Session sesion = sessionFactory.openSession();
-        sesion.beginTransaction();
-        sesion.saveOrUpdate(o);
-        sesion.getTransaction().commit();
-        sesion.close();
+    public boolean modificar(Object o){
+       try {
+           Session sesion = sessionFactory.openSession();
+           sesion.beginTransaction();
+           sesion.saveOrUpdate(o);
+           sesion.getTransaction().commit();
+           sesion.close();
+           return true;
+       }catch (Exception e){
+           e.printStackTrace();
+           return false;
+       }
     }
 
     //verificar
@@ -206,6 +212,21 @@ public class Modelo {
                     "select count(c) from Cancion c where c.album.idAlbum = :id",
                     Long.class
             ).setParameter("id", idAlbum)
+                    .uniqueResult();
+
+            return count != null && count > 0;
+        } finally {
+            s.close();
+        }
+    }
+
+    public boolean autorTieneCancion(int idautor){
+        Session s = sessionFactory.openSession();
+        try {
+            Long count = s.createQuery(
+                    "select count(c) from Cancion c where c.autor.idAutor = :id",
+                    Long.class
+            ).setParameter("id", idautor)
                     .uniqueResult();
 
             return count != null && count > 0;

@@ -11,6 +11,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowListener;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
@@ -84,9 +85,20 @@ public class Controlador implements ActionListener, ListSelectionListener {
                 break;
             case "Conectar":
                 vista.itemConectar.setEnabled(false);
+                vista.itemDesconectar.setEnabled(true);
                 modelo.conectar();
+                JOptionPane.showMessageDialog(null, "Usted se ha conectado a la base de datos, todo funcionará a la perfección");
+
                 conectado = true;
                 break;
+            case"Desconectar":
+                vista.itemDesconectar.setEnabled(false);
+                vista.itemConectar.setEnabled(true);
+                modelo.desconectar();
+                JOptionPane.showMessageDialog(null, "Usted se ha desconectado de la base de datos, no funcionará nada");
+                conectado = false;
+                limpiarCampos();
+                return;
             case "listarProductoras":
                 listarProductoras(modelo.getProd());
                 break;
@@ -123,14 +135,91 @@ public class Controlador implements ActionListener, ListSelectionListener {
             case"eliminarAlbum":
                 eliminarAlbum();
                 break;
+            case "actualizarCancion":
+                modificarCancion();
+                break;
+            case "actualizarAlbum":
+                modificarAlbum();
+                break;
+            case"actualizarProductora":
+                modificarProductora();
+                break;
+            case"actualizarAutor":
+                modificarAutor();
+                break;
         }
         limpiarCampos();
         actualizar();
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+    public void valueChanged(ListSelectionEvent e) {
+        if (e.getValueIsAdjusting()){
+            if (e.getSource() == vista.listaCanciones){
+                Cancion cancionSeleccion = (Cancion) vista.listaCanciones.getSelectedValue();
+                Album a = cancionSeleccion.getAlbum();
+                Autor au = cancionSeleccion.getAutor();
+                Productora prod = cancionSeleccion.getProductora();
+                vista.campoTituloCancion.setText(String.valueOf(cancionSeleccion.getTitulo()));
+                vista.campoALbum.setSelectedItem(new AlbumItem(a));
+                vista.campoAutor.setSelectedItem(new AutorItem(au));
+                vista.campoTituloCancion.setText(String.valueOf(cancionSeleccion.getTitulo()));
+                vista.campoGenero.setText(String.valueOf(cancionSeleccion.getGenero()));
+                vista.campoProd.setSelectedItem(new ProductoraItem(prod));
+                vista.campoDuracion.setValue(cancionSeleccion.getDuracion());
+                vista.campoNumParticipantes.setValue(cancionSeleccion.getParticipantes());
+                vista.campoValoracion.setValue(cancionSeleccion.getValoracion());
 
+                String idiomas = cancionSeleccion.getIdioma();
+                vista.españolCheckBox.setSelected(false);
+                vista.dembowCheckBox.setSelected(false);
+                vista.inglesCheckBox.setSelected(false);
+
+                if (idiomas != null && !idiomas.isBlank()) {
+                    // split por coma, quitando espacios
+                    String[] parte = idiomas.split("\\s*,\\s*");
+                    for (String s : parte) {
+                        if ("Español".equalsIgnoreCase(s)) vista.españolCheckBox.setSelected(true);
+                        else if ("Ingles".equalsIgnoreCase(s)) vista.inglesCheckBox.setSelected(true);
+                        else if ("Dembow".equalsIgnoreCase(s)) vista.dembowCheckBox.setSelected(true);
+                    }
+                }
+            }
+            if (e.getSource() == vista.listaAutores){
+                Autor autorSeleccion = (Autor) vista.listaAutores.getSelectedValue();
+
+                vista.campoNombreArtistico.setText(autorSeleccion.getNombreArtistico());
+                vista.campoNombreReal.setText(autorSeleccion.getNombreReal());
+                vista.campoEdad.setValue(autorSeleccion.getEdad());
+                vista.campoPais.setSelectedItem(autorSeleccion.getPais());
+                vista.campoFechaPrimeraPubli.setDate(autorSeleccion.getFechaPrimeraPublicacion().toLocalDate());
+
+                boolean gira = autorSeleccion.isGira();
+                vista.siRadioButton.setSelected(gira);
+                vista.noRadioButton.setSelected(!gira);
+            }
+            if (e.getSource() == vista.listaAlbumes){
+                Album albumSeleccion = (Album) vista.listaAlbumes.getSelectedValue();
+                Autor au = albumSeleccion.getAutor();
+                Productora prod = albumSeleccion.getProductora();
+                vista.campoTituloAlbum.setText(albumSeleccion.getTitulo());
+                vista.campoNumCanciones.setValue(albumSeleccion.getNumeroCanciones());
+                vista.campoNumDuracion.setValue(albumSeleccion.getDuracionMinutos());
+                vista.campoFechaSalidaAlbum.setDate(albumSeleccion.getFechaSalida().toLocalDate());
+                vista.comboAutores.setSelectedItem(new AutorItem(au));
+                vista.comboProductora.setSelectedItem(new ProductoraItem(prod));
+
+            }
+            if (e.getSource() == vista.listaProductora){
+                Productora prodSeleccion = (Productora) vista.listaProductora.getSelectedValue();
+                vista.campoNombreProd.setText(prodSeleccion.getNombre());
+                vista.comboLocalizacion.setSelectedItem(prodSeleccion.getLocalizacion());
+                vista.campoNumTrabajadores.setValue(prodSeleccion.getTrabajadores());
+                vista.campoFechaFundacion.setDate(prodSeleccion.getFechaFundacion().toLocalDate());
+                vista.campoPropietario.setText(prodSeleccion.getPropietario());
+
+            }
+        }
     }
 
     public void listarProductoras(ArrayList<Productora> lista){
@@ -165,7 +254,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
         for (Album a : lista) {
             vista.campoALbum.addItem(new AlbumItem(a));
         }
-        vista.campoALbum.setSelectedItem(0);
+        vista.campoALbum.setSelectedIndex(0);
     }
 
     public void listarAutor(ArrayList<Autor> lista){
@@ -194,11 +283,34 @@ public class Controlador implements ActionListener, ListSelectionListener {
     public class AlbumItem {
         private final Album album;
 
-        public AlbumItem(Album album) { this.album = album; }
-        public Album getAlbum() { return album; }
+        public AlbumItem(Album album) {
+            this.album = album;
+        }
+
+        public Album getAlbum() {
+            return album;
+        }
 
         @Override
-        public String toString() { return album.getTitulo(); }
+        public String toString() {
+            return album.getTitulo();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof AlbumItem)) return false;
+
+            AlbumItem that = (AlbumItem) o;
+
+            if (this.album == null || that.album == null) return false;
+            return this.album.getIdAlbum() == that.album.getIdAlbum();
+        }
+
+        @Override
+        public int hashCode() {
+            return Integer.hashCode(album != null ? album.getIdAlbum() : 0);
+        }
     }
     public class ProductoraItem {
         private final Productora productora;
@@ -210,9 +322,26 @@ public class Controlador implements ActionListener, ListSelectionListener {
         public Productora getProductora() {
             return productora;
         }
+
         @Override
         public String toString() {
-            return productora.getNombre(); // solo el nombre en el combo
+            return productora.getNombre();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ProductoraItem)) return false;
+
+            ProductoraItem that = (ProductoraItem) o;
+
+            if (this.productora == null || that.productora == null) return false;
+            return this.productora.getIdProductora() == that.productora.getIdProductora();
+        }
+
+        @Override
+        public int hashCode() {
+            return Integer.hashCode(productora != null ? productora.getIdProductora() : 0);
         }
     }
 
@@ -222,12 +351,30 @@ public class Controlador implements ActionListener, ListSelectionListener {
         public AutorItem(Autor autor) {
             this.autor = autor;
         }
+
         public Autor getAutor() {
             return autor;
         }
+
         @Override
         public String toString() {
             return autor.getNombreArtistico();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof AutorItem)) return false;
+
+            AutorItem that = (AutorItem) o;
+
+            if (this.autor == null || that.autor == null) return false;
+            return this.autor.getIdAutor() == that.autor.getIdAutor();
+        }
+
+        @Override
+        public int hashCode() {
+            return Integer.hashCode(autor != null ? autor.getIdAutor() : 0);
         }
     }
 
@@ -498,6 +645,11 @@ public class Controlador implements ActionListener, ListSelectionListener {
     }
     private void eliminarAutor(){
         Autor a = (Autor) vista.listaAutores.getSelectedValue();
+        if (!comprobarAutorCancion(a.getIdAutor())) {
+            JOptionPane.showMessageDialog(null, "Este Autor tiene canciones asociadas, Elimina o cambia las canciones",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         modelo.eliminar(a);
         JOptionPane.showMessageDialog(null, "Autor eliminado correctamente");
     }
@@ -512,6 +664,169 @@ public class Controlador implements ActionListener, ListSelectionListener {
 
     private boolean comprobarAlbumCancion(int id){
         return !modelo.albumTieneCancion(id);
+    }
+
+    private boolean comprobarAutorCancion(int id){
+        return !modelo.autorTieneCancion(id);
+    }
+
+    //modificar
+    private void modificarCancion(){
+        if (!Util.comprobarCampoVacio(vista.campoTituloCancion)) {
+            Util.lanzaAlertaVacio(vista.campoTituloCancion);
+        } else if (!Util.comprobarCampoVacio(vista.campoGenero)) {
+            Util.lanzaAlertaVacio(vista.campoGenero);
+        } else if (!Util.comprobarSpinner(vista.campoNumParticipantes)) {
+            JOptionPane.showMessageDialog(null, "El Nº de participantes no puede ser menor que 0");
+        } else if (!Util.comprobarSpinner(vista.campoDuracion)) {
+            JOptionPane.showMessageDialog(null, "La duración no puede ser menor o igual que 0");
+        } else if (!vista.españolCheckBox.isSelected() && !vista.inglesCheckBox.isSelected() && !vista.dembowCheckBox.isSelected()) {
+            JOptionPane.showMessageDialog(null, "Selecciona al menos un idioma");
+        } else {
+            Cancion c = (Cancion)vista.listaCanciones.getSelectedValue();
+            c.setTitulo(vista.campoTituloCancion.getText());
+
+            AlbumItem itemAlbum = (AlbumItem) vista.campoALbum.getSelectedItem();
+            Album albumReal = itemAlbum.getAlbum();
+            c.setAlbum(albumReal);
+
+
+            AutorItem itemAutor = (AutorItem) vista.campoAutor.getSelectedItem();
+            Autor autorReal = itemAutor.getAutor();
+            c.setAutor(autorReal);
+
+            c.setGenero(vista.campoGenero.getText());
+
+            ProductoraItem itemProd = (ProductoraItem) vista.campoProd.getSelectedItem();
+            Productora prodReal = itemProd.getProductora();
+            c.setProductora(prodReal);
+
+            c.setParticipantes(((Number)vista.campoNumParticipantes.getValue()).intValue());
+            c.setDuracion(((Number)vista.campoDuracion.getValue()).floatValue());
+            c.setValoracion(vista.campoValoracion.getValue());
+
+            StringBuilder idioma = new StringBuilder();
+
+            if (vista.españolCheckBox.isSelected()) idioma.append("Español,");
+            if (vista.inglesCheckBox.isSelected()) idioma.append("Ingles,");
+            if (vista.dembowCheckBox.isSelected()) idioma.append("Dembow,");
+            idioma.deleteCharAt(idioma.length() - 1);
+
+            c.setIdioma(idioma.toString());
+
+
+            if (modelo.modificar(c)){
+                JOptionPane.showMessageDialog(null, "La canción se ha actualizado correctamente");
+                borrarCamposCancion();
+            } else {
+                JOptionPane.showMessageDialog(null, "Canción no Actualizada");
+            }
+        }
+    }
+
+    private void modificarAlbum(){
+        if (!Util.comprobarCampoVacio(vista.campoTituloAlbum)) {
+            Util.lanzaAlertaVacio(vista.campoTituloAlbum);
+        } else if (!Util.comprobarSpinner(vista.campoNumCanciones)) {
+            JOptionPane.showMessageDialog(null, "El campo Numero de canciones no puede ser menor que 0");
+        } else if (!Util.comprobarSpinner(vista.campoDuracion)) {
+            JOptionPane.showMessageDialog(null, "El campo Duracion en minutos no puede ser menor que 0");
+        } else if (Util.campoVacioCalendario(vista.campoFechaSalidaAlbum)) {
+            Util.lanzaAlertaVacioCalendar(vista.campoFechaSalidaAlbum);
+        } else {
+            Album a = (Album) vista.listaAlbumes.getSelectedValue();
+            a.setTitulo(vista.campoTituloAlbum.getText());
+
+            //tengo que sacar el valor real del combovox del wrapper  que ya uso para el combobox
+            AutorItem item = (AutorItem) vista.comboAutores.getSelectedItem();
+            Autor autorReal = item.getAutor();
+            a.setAutor(autorReal);
+
+            a.setNumeroCanciones((Integer) vista.campoNumCanciones.getValue());
+            a.setDuracionMinutos(((Number)vista.campoNumDuracion.getValue()).intValue());
+
+            LocalDate id = vista.campoFechaSalidaAlbum.getDate();
+            a.setFechaSalida(java.sql.Date.valueOf(id));
+
+            ProductoraItem item2 = (ProductoraItem) vista.comboProductora.getSelectedItem();
+            Productora productoraReal = item2.getProductora();
+            a.setProductora(productoraReal);
+
+
+            if (modelo.modificar(a)) {
+                JOptionPane.showMessageDialog(null, "El Album ha sido actualizado correctamente");
+                borrarCamposAlbum();
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Album no actualizado ");
+            }
+        }
+    }
+
+    public void modificarAutor(){
+        if (!Util.comprobarCampoVacio(vista.campoNombreArtistico)) {
+            Util.lanzaAlertaVacio(vista.campoNombreArtistico);
+        } else if (!Util.comprobarCampoVacio(vista.campoNombreReal)) {
+            Util.lanzaAlertaVacio(vista.campoNombreReal);
+        } else if (!Util.comprobarSpinner(vista.campoEdad)) {
+            JOptionPane.showMessageDialog(null, "El campo edad no puede ser menor que 13");
+        } else if (Util.comprobarCombobox(vista.campoPais)) {
+            Util.lanzaAlertaCombo(vista.campoPais);
+        } else if (Util.campoVacioCalendario(vista.campoFechaPrimeraPubli)) {
+            Util.lanzaAlertaVacioCalendar(vista.campoFechaPrimeraPubli);
+        } else {
+            Autor au = (Autor) vista.listaAutores.getSelectedValue();
+            boolean gira = vista.siRadioButton.isSelected();
+            au.setNombreArtistico(vista.campoNombreArtistico.getText());
+            au.setNombreReal(vista.campoNombreReal.getText());
+            au.setEdad((Integer)vista.campoEdad.getValue());
+            au.setPais(vista.campoPais.getSelectedItem().toString());
+
+            LocalDate id = vista.campoFechaPrimeraPubli.getDate();
+            au.setFechaPrimeraPublicacion(java.sql.Date.valueOf(id));
+            au.setGira(gira);
+
+            if (modelo.modificar(au)) {
+                JOptionPane.showMessageDialog(null, "El Autor ha sido actualizado correctamente");
+                borrarCamposProductora();
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Autor no actualizado ");
+            }
+
+        }
+    }
+
+    public void modificarProductora(){
+        if (!Util.comprobarCampoVacio(vista.campoNombreProd)) {
+            Util.lanzaAlertaVacio(vista.campoNombreProd);
+        } else if (Util.comprobarCombobox(vista.comboLocalizacion)) {
+            Util.lanzaAlertaCombo(vista.comboLocalizacion);
+        } else if (!Util.comprobarSpinner(vista.campoNumTrabajadores)) {
+            JOptionPane.showMessageDialog(null, "El campo Trabajadores no puede ser menor que 0");
+        } else if (Util.campoVacioCalendario(vista.campoFechaFundacion)) {
+            Util.lanzaAlertaVacioCalendar(vista.campoFechaFundacion);
+        } else if (!Util.comprobarCampoVacio(vista.campoPropietario)) {
+            Util.lanzaAlertaVacio(vista.campoPropietario);
+        } else {
+            Productora prod = (Productora) vista.listaProductora.getSelectedValue();
+            prod.setNombre(vista.campoNombreProd.getText());
+            prod.setLocalizacion(vista.comboLocalizacion.getSelectedItem().toString());
+            prod.setTrabajadores((Integer)vista.campoNumTrabajadores.getValue());
+            //transformamos el LocalDate a Date, ya que la base de datos recibe Date y en el proyecto existe LocalDate
+            LocalDate id = vista.campoFechaFundacion.getDate();
+            prod.setFechaFundacion(java.sql.Date.valueOf(id));
+            prod.setPropietario(vista.campoPropietario.getText());
+
+            if (modelo.modificar(prod)) {
+                JOptionPane.showMessageDialog(null, "La Productora ha sido actualizada correctamente");
+                borrarCamposProductora();
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Productora no actualizada ");
+            }
+
+        }
     }
 
 }
