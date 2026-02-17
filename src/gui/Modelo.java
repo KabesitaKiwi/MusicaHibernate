@@ -143,6 +143,79 @@ public class Modelo {
         }
     }
 
+    public boolean existeCancionPorAutor(int idAutor, String titulo){
+        try (Session sesion = sessionFactory.openSession()) {
+            Query<Integer> q = sesion.createQuery(
+                    "select 1 from Cancion c where c.autor.idAutor = :idAutor and c.titulo = :titulo",
+                    Integer.class
+            );
+            q.setParameter("idAutor", idAutor);
+            q.setParameter("titulo", titulo);
+            q.setMaxResults(1);
+            return q.uniqueResult() != null;
+        }
+    }
+
+    public boolean existeCancionPorAlbum(int idAlbum, String titulo){
+        try (Session sesion = sessionFactory.openSession()) {
+            Query<Integer> q = sesion.createQuery(
+                    "select 1 from Cancion c where c.album.idAlbum = :idAlbum and c.titulo = :titulo",
+                    Integer.class
+            );
+            q.setParameter("idAlbum", idAlbum);
+            q.setParameter("titulo", titulo);
+            q.setMaxResults(1);
+            return q.uniqueResult() != null;
+        }
+    }
+
+    public boolean productoraTieneCanciones(int idProductora) {
+        Session s = sessionFactory.openSession();
+        try {
+            Long count = s.createQuery(
+                    "select count(c) from Cancion c where c.productora.idProductora = :id",
+                    Long.class
+            ).setParameter("id", idProductora)
+                    .uniqueResult();
+
+            return count != null && count > 0;
+        } finally {
+            s.close();
+        }
+    }
+
+    public boolean productoraTieneAlbumes(int idProductora) {
+        Session s = sessionFactory.openSession();
+        try {
+            Long count = s.createQuery(
+                    "select count(a) from Album a where a.productora.idProductora = :id",
+                    Long.class
+            ).setParameter("id", idProductora)
+                    .uniqueResult();
+
+            return count != null && count > 0;
+        } finally {
+            s.close();
+        }
+    }
+
+    public boolean albumTieneCancion(int idAlbum) {
+        Session s = sessionFactory.openSession();
+        try {
+            Long count = s.createQuery(
+                    "select count(c) from Cancion c where c.album.idAlbum = :id",
+                    Long.class
+            ).setParameter("id", idAlbum)
+                    .uniqueResult();
+
+            return count != null && count > 0;
+        } finally {
+            s.close();
+        }
+    }
+
+
+
 
 
 }

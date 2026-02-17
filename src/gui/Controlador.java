@@ -108,6 +108,21 @@ public class Controlador implements ActionListener, ListSelectionListener {
             case "anadirAlbum":
                 registrarAlbum();
                 break;
+            case "anadirCancion":
+                registrarCancion();
+                break;
+            case "eliminarProductora":
+                eliminarProductora();
+                break;
+            case "eliminarCancion":
+                eliminarCancion();
+                break;
+            case "eliminarAutor":
+                eliminarAutor();
+                break;
+            case"eliminarAlbum":
+                eliminarAlbum();
+                break;
         }
         limpiarCampos();
         actualizar();
@@ -341,6 +356,72 @@ public class Controlador implements ActionListener, ListSelectionListener {
         }
     }
 
+    public void registrarCancion(){
+        if (!Util.comprobarCampoVacio(vista.campoTituloCancion)) {
+            Util.lanzaAlertaVacio(vista.campoTituloCancion);
+        } else if (!Util.comprobarCampoVacio(vista.campoGenero)) {
+            Util.lanzaAlertaVacio(vista.campoGenero);
+        } else if (!Util.comprobarSpinner(vista.campoNumParticipantes)) {
+            JOptionPane.showMessageDialog(null, "El Nº de participantes no puede ser menor que 0");
+        } else if (!Util.comprobarSpinner(vista.campoDuracion)) {
+            JOptionPane.showMessageDialog(null, "La duración no puede ser menor o igual que 0");
+        } else if (!vista.españolCheckBox.isSelected() && !vista.inglesCheckBox.isSelected() && !vista.dembowCheckBox.isSelected()) {
+            JOptionPane.showMessageDialog(null, "Selecciona al menos un idioma");
+        } else {
+
+            Cancion nuevaCancion = new Cancion();
+
+            nuevaCancion.setTitulo(vista.campoTituloCancion.getText());
+
+            AlbumItem itemAlbum = (AlbumItem) vista.campoALbum.getSelectedItem();
+            Album albumReal = itemAlbum.getAlbum();
+            nuevaCancion.setAlbum(albumReal);
+
+
+            AutorItem itemAutor = (AutorItem) vista.campoAutor.getSelectedItem();
+            Autor autorReal = itemAutor.getAutor();
+            nuevaCancion.setAutor(autorReal);
+
+            nuevaCancion.setGenero(vista.campoGenero.getText());
+
+            ProductoraItem itemProd = (ProductoraItem) vista.campoProd.getSelectedItem();
+            Productora prodReal = itemProd.getProductora();
+            nuevaCancion.setProductora(prodReal);
+
+            nuevaCancion.setParticipantes(((Number)vista.campoNumParticipantes.getValue()).intValue());
+            nuevaCancion.setDuracion(((Number)vista.campoDuracion.getValue()).floatValue());
+            nuevaCancion.setValoracion(vista.campoValoracion.getValue());
+
+            StringBuilder idioma = new StringBuilder();
+
+            if (vista.españolCheckBox.isSelected()) idioma.append("Español,");
+            if (vista.inglesCheckBox.isSelected()) idioma.append("Ingles,");
+            if (vista.dembowCheckBox.isSelected()) idioma.append("Dembow,");
+            idioma.deleteCharAt(idioma.length() - 1);
+
+            nuevaCancion.setIdioma(idioma.toString());
+
+            if(modelo.existeCancionPorAutor(nuevaCancion.getAutor().getIdAutor(), nuevaCancion.getTitulo())){
+                JOptionPane.showMessageDialog(null, "Esa canción ya existe en este Artista.");
+                vista.campoTituloCancion.setText("");
+                return;
+            }
+            if (modelo.existeCancionPorAlbum(nuevaCancion.getAlbum().getIdAlbum(), nuevaCancion.getTitulo())) {
+                JOptionPane.showMessageDialog(null, "Esa canción ya existe en este álbum.");
+                vista.campoTituloCancion.setText("");
+                return;
+            }
+
+            if (modelo.insertar(nuevaCancion)){
+                JOptionPane.showMessageDialog(null, "La canción se ha registrado correctamente");
+                borrarCamposCancion();
+            } else {
+                JOptionPane.showMessageDialog(null, "Canción no registrada");
+            }
+
+        }
+    }
+
     //limpiar Campos
     private void borrarCamposCancion() {
         vista.campoTituloCancion.setText("");
@@ -388,7 +469,49 @@ public class Controlador implements ActionListener, ListSelectionListener {
         borrarCamposAutor();
         borrarCamposProductora();
     }
+    private void eliminarProductora(){
+        Productora p = (Productora) vista.listaProductora.getSelectedValue();
+        if (!comprobarProductoraCancion(p.getIdProductora()) || !comprobarProductoraAlbum(p.getIdProductora())) {
+            JOptionPane.showMessageDialog(null, "Esta productora tiene canciones asociadas. Elimina o reasigna primero esas canciones.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        modelo.eliminar(p);
+        JOptionPane.showMessageDialog(null, "Productora eliminada correctamente");
 
+    }
+    private void eliminarAlbum(){
+        Album a = (Album) vista.listaAlbumes.getSelectedValue();
+        if (!comprobarAlbumCancion(a.getIdAlbum())) {
+            JOptionPane.showMessageDialog(null, "Este Album tiene canciones asociadas, Elimina o cambia las canciones",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        modelo.eliminar(a);
+        JOptionPane.showMessageDialog(null, "Album eliminado correctamente");
 
+    }
+    private void eliminarCancion(){
+        Cancion c = (Cancion) vista.listaCanciones.getSelectedValue();
+        modelo.eliminar(c);
+        JOptionPane.showMessageDialog(null, "Canción eliminada correctamente");
+    }
+    private void eliminarAutor(){
+        Autor a = (Autor) vista.listaAutores.getSelectedValue();
+        modelo.eliminar(a);
+        JOptionPane.showMessageDialog(null, "Autor eliminado correctamente");
+    }
+
+    private boolean comprobarProductoraCancion(int id){
+        return !modelo.productoraTieneCanciones(id);
+    }
+
+    private boolean comprobarProductoraAlbum(int id){
+        return !modelo.productoraTieneAlbumes(id);
+    }
+
+    private boolean comprobarAlbumCancion(int id){
+        return !modelo.albumTieneCancion(id);
+    }
 
 }
