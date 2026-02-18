@@ -84,11 +84,10 @@ public class Vista extends JFrame{
     DefaultListModel dtmProductora;
 
     //menuBar
-    JMenuItem itemOpciones;
     JMenuItem itemDesconectar;
     JMenuItem itemSalir;
     JMenuItem itemConectar;
-    JButton botonBuscar;
+
 
 
 

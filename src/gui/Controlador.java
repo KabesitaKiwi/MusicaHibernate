@@ -94,6 +94,10 @@ public class Controlador implements ActionListener, ListSelectionListener {
             case"Desconectar":
                 vista.itemDesconectar.setEnabled(false);
                 vista.itemConectar.setEnabled(true);
+                vista.dtmCanciones.clear();
+                vista.dtmAlbum.clear();
+                vista.dtmAutores.clear();
+                vista.dtmProductora.clear();
                 modelo.desconectar();
                 JOptionPane.showMessageDialog(null, "Usted se ha desconectado de la base de datos, no funcionará nada");
                 conectado = false;
