@@ -4,28 +4,27 @@ import com.erwinLagos.musica.Album;
 import com.erwinLagos.musica.Autor;
 import com.erwinLagos.musica.Cancion;
 import com.erwinLagos.musica.Productora;
-import util.Util;
+import util.Utilidades;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowListener;
-import java.sql.Date;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.ArrayList;
 
 public class Controlador implements ActionListener, ListSelectionListener {
     private Vista vista;
     private Modelo modelo;
     private boolean conectado;
+    private Utilidades util;
 
-    public Controlador(Modelo modelo, Vista vista) {
+    public Controlador(Modelo modelo, Vista vista, Utilidades util) {
         this.vista = vista;
         this.modelo = modelo;
         this.conectado = false;
+        this.util = util;
 
         addActionListeners(this);
         addListSelectionListener(this);
@@ -383,16 +382,16 @@ public class Controlador implements ActionListener, ListSelectionListener {
     }
 
     public void registrarProductora(){
-        if (!Util.comprobarCampoVacio(vista.campoNombreProd)) {
-            Util.lanzaAlertaVacio(vista.campoNombreProd);
-        } else if (Util.comprobarCombobox(vista.comboLocalizacion)) {
-            Util.lanzaAlertaCombo(vista.comboLocalizacion);
-        } else if (!Util.comprobarSpinner(vista.campoNumTrabajadores)) {
+        if (!util.comprobarCampoVacio(vista.campoNombreProd)) {
+            util.lanzaAlertaVacio(vista.campoNombreProd);
+        } else if (util.comprobarCombobox(vista.comboLocalizacion)) {
+            util.lanzaAlertaCombo(vista.comboLocalizacion);
+        } else if (!util.comprobarSpinner(vista.campoNumTrabajadores)) {
             JOptionPane.showMessageDialog(null, "El campo Trabajadores no puede ser menor que 0");
-        } else if (Util.campoVacioCalendario(vista.campoFechaFundacion)) {
-            Util.lanzaAlertaVacioCalendar(vista.campoFechaFundacion);
-        } else if (!Util.comprobarCampoVacio(vista.campoPropietario)) {
-            Util.lanzaAlertaVacio(vista.campoPropietario);
+        } else if (util.campoVacioCalendario(vista.campoFechaFundacion)) {
+            util.lanzaAlertaVacioCalendar(vista.campoFechaFundacion);
+        } else if (!util.comprobarCampoVacio(vista.campoPropietario)) {
+            util.lanzaAlertaVacio(vista.campoPropietario);
         } else {
             Productora nuevaProductora = new Productora();
             nuevaProductora.setNombre(vista.campoNombreProd.getText());
@@ -421,16 +420,16 @@ public class Controlador implements ActionListener, ListSelectionListener {
     }
 
     public void registrarAutor(){
-        if (!Util.comprobarCampoVacio(vista.campoNombreArtistico)) {
-            Util.lanzaAlertaVacio(vista.campoNombreArtistico);
-        } else if (!Util.comprobarCampoVacio(vista.campoNombreReal)) {
-            Util.lanzaAlertaVacio(vista.campoNombreReal);
-        } else if (!Util.comprobarSpinner(vista.campoEdad)) {
+        if (!util.comprobarCampoVacio(vista.campoNombreArtistico)) {
+            util.lanzaAlertaVacio(vista.campoNombreArtistico);
+        } else if (!util.comprobarCampoVacio(vista.campoNombreReal)) {
+            util.lanzaAlertaVacio(vista.campoNombreReal);
+        } else if (!util.comprobarSpinner(vista.campoEdad)) {
             JOptionPane.showMessageDialog(null, "El campo edad no puede ser menor que 13");
-        } else if (Util.comprobarCombobox(vista.campoPais)) {
-            Util.lanzaAlertaCombo(vista.campoPais);
-        } else if (Util.campoVacioCalendario(vista.campoFechaPrimeraPubli)) {
-            Util.lanzaAlertaVacioCalendar(vista.campoFechaPrimeraPubli);
+        } else if (util.comprobarCombobox(vista.campoPais)) {
+            util.lanzaAlertaCombo(vista.campoPais);
+        } else if (util.campoVacioCalendario(vista.campoFechaPrimeraPubli)) {
+            util.lanzaAlertaVacioCalendar(vista.campoFechaPrimeraPubli);
         } else {
             Autor nuevoAutor = new Autor();
             boolean gira = vista.siRadioButton.isSelected();
@@ -461,16 +460,16 @@ public class Controlador implements ActionListener, ListSelectionListener {
     }
 
     public void registrarAlbum(){
-        if (!Util.comprobarCampoVacio(vista.campoTituloAlbum)) {
-            Util.lanzaAlertaVacio(vista.campoTituloAlbum);
-        } else if (!Util.comprobarSpinner(vista.campoNumCanciones)) {
+        if (!util.comprobarCampoVacio(vista.campoTituloAlbum)) {
+            util.lanzaAlertaVacio(vista.campoTituloAlbum);
+        } else if (!util.comprobarSpinner(vista.campoNumCanciones)) {
             JOptionPane.showMessageDialog(null, "El campo Numero de canciones no puede ser menor que 0");
-        } else if (!Util.comprobarSpinner(vista.campoDuracion)) {
+        } else if (!util.comprobarSpinner(vista.campoDuracion)) {
             JOptionPane.showMessageDialog(null, "El campo Duracion en minutos no puede ser menor que 0");
-        } else if (Util.campoVacioCalendario(vista.campoFechaSalidaAlbum)) {
-            Util.lanzaAlertaVacioCalendar(vista.campoFechaSalidaAlbum);
-        } else if (Util.comprobarCombobox(vista.comboProductora)) {
-            Util.lanzaAlertaCombo(vista.comboProductora);
+        } else if (util.campoVacioCalendario(vista.campoFechaSalidaAlbum)) {
+            util.lanzaAlertaVacioCalendar(vista.campoFechaSalidaAlbum);
+        } else if (util.comprobarCombobox(vista.comboProductora)) {
+            util.lanzaAlertaCombo(vista.comboProductora);
         } else {
             Album nuevoAlbum = new Album();
             nuevoAlbum.setTitulo(vista.campoTituloAlbum.getText());
@@ -508,13 +507,13 @@ public class Controlador implements ActionListener, ListSelectionListener {
     }
 
     public void registrarCancion(){
-        if (!Util.comprobarCampoVacio(vista.campoTituloCancion)) {
-            Util.lanzaAlertaVacio(vista.campoTituloCancion);
-        } else if (!Util.comprobarCampoVacio(vista.campoGenero)) {
-            Util.lanzaAlertaVacio(vista.campoGenero);
-        } else if (!Util.comprobarSpinner(vista.campoNumParticipantes)) {
+        if (!util.comprobarCampoVacio(vista.campoTituloCancion)) {
+            util.lanzaAlertaVacio(vista.campoTituloCancion);
+        } else if (!util.comprobarCampoVacio(vista.campoGenero)) {
+            util.lanzaAlertaVacio(vista.campoGenero);
+        } else if (!util.comprobarSpinner(vista.campoNumParticipantes)) {
             JOptionPane.showMessageDialog(null, "El Nº de participantes no puede ser menor que 0");
-        } else if (!Util.comprobarSpinner(vista.campoDuracion)) {
+        } else if (!util.comprobarSpinner(vista.campoDuracion)) {
             JOptionPane.showMessageDialog(null, "La duración no puede ser menor o igual que 0");
         } else if (!vista.españolCheckBox.isSelected() && !vista.inglesCheckBox.isSelected() && !vista.dembowCheckBox.isSelected()) {
             JOptionPane.showMessageDialog(null, "Selecciona al menos un idioma");
@@ -676,13 +675,13 @@ public class Controlador implements ActionListener, ListSelectionListener {
 
     //modificar
     private void modificarCancion(){
-        if (!Util.comprobarCampoVacio(vista.campoTituloCancion)) {
-            Util.lanzaAlertaVacio(vista.campoTituloCancion);
-        } else if (!Util.comprobarCampoVacio(vista.campoGenero)) {
-            Util.lanzaAlertaVacio(vista.campoGenero);
-        } else if (!Util.comprobarSpinner(vista.campoNumParticipantes)) {
+        if (!util.comprobarCampoVacio(vista.campoTituloCancion)) {
+            util.lanzaAlertaVacio(vista.campoTituloCancion);
+        } else if (!util.comprobarCampoVacio(vista.campoGenero)) {
+            util.lanzaAlertaVacio(vista.campoGenero);
+        } else if (!util.comprobarSpinner(vista.campoNumParticipantes)) {
             JOptionPane.showMessageDialog(null, "El Nº de participantes no puede ser menor que 0");
-        } else if (!Util.comprobarSpinner(vista.campoDuracion)) {
+        } else if (!util.comprobarSpinner(vista.campoDuracion)) {
             JOptionPane.showMessageDialog(null, "La duración no puede ser menor o igual que 0");
         } else if (!vista.españolCheckBox.isSelected() && !vista.inglesCheckBox.isSelected() && !vista.dembowCheckBox.isSelected()) {
             JOptionPane.showMessageDialog(null, "Selecciona al menos un idioma");
@@ -729,14 +728,14 @@ public class Controlador implements ActionListener, ListSelectionListener {
     }
 
     private void modificarAlbum(){
-        if (!Util.comprobarCampoVacio(vista.campoTituloAlbum)) {
-            Util.lanzaAlertaVacio(vista.campoTituloAlbum);
-        } else if (!Util.comprobarSpinner(vista.campoNumCanciones)) {
+        if (!util.comprobarCampoVacio(vista.campoTituloAlbum)) {
+            util.lanzaAlertaVacio(vista.campoTituloAlbum);
+        } else if (!util.comprobarSpinner(vista.campoNumCanciones)) {
             JOptionPane.showMessageDialog(null, "El campo Numero de canciones no puede ser menor que 0");
-        } else if (!Util.comprobarSpinner(vista.campoDuracion)) {
+        } else if (!util.comprobarSpinner(vista.campoDuracion)) {
             JOptionPane.showMessageDialog(null, "El campo Duracion en minutos no puede ser menor que 0");
-        } else if (Util.campoVacioCalendario(vista.campoFechaSalidaAlbum)) {
-            Util.lanzaAlertaVacioCalendar(vista.campoFechaSalidaAlbum);
+        } else if (util.campoVacioCalendario(vista.campoFechaSalidaAlbum)) {
+            util.lanzaAlertaVacioCalendar(vista.campoFechaSalidaAlbum);
         } else {
             Album a = (Album) vista.listaAlbumes.getSelectedValue();
             a.setTitulo(vista.campoTituloAlbum.getText());
@@ -768,16 +767,16 @@ public class Controlador implements ActionListener, ListSelectionListener {
     }
 
     public void modificarAutor(){
-        if (!Util.comprobarCampoVacio(vista.campoNombreArtistico)) {
-            Util.lanzaAlertaVacio(vista.campoNombreArtistico);
-        } else if (!Util.comprobarCampoVacio(vista.campoNombreReal)) {
-            Util.lanzaAlertaVacio(vista.campoNombreReal);
-        } else if (!Util.comprobarSpinner(vista.campoEdad)) {
+        if (!util.comprobarCampoVacio(vista.campoNombreArtistico)) {
+            util.lanzaAlertaVacio(vista.campoNombreArtistico);
+        } else if (!util.comprobarCampoVacio(vista.campoNombreReal)) {
+            util.lanzaAlertaVacio(vista.campoNombreReal);
+        } else if (!util.comprobarSpinner(vista.campoEdad)) {
             JOptionPane.showMessageDialog(null, "El campo edad no puede ser menor que 13");
-        } else if (Util.comprobarCombobox(vista.campoPais)) {
-            Util.lanzaAlertaCombo(vista.campoPais);
-        } else if (Util.campoVacioCalendario(vista.campoFechaPrimeraPubli)) {
-            Util.lanzaAlertaVacioCalendar(vista.campoFechaPrimeraPubli);
+        } else if (util.comprobarCombobox(vista.campoPais)) {
+            util.lanzaAlertaCombo(vista.campoPais);
+        } else if (util.campoVacioCalendario(vista.campoFechaPrimeraPubli)) {
+            util.lanzaAlertaVacioCalendar(vista.campoFechaPrimeraPubli);
         } else {
             Autor au = (Autor) vista.listaAutores.getSelectedValue();
             boolean gira = vista.siRadioButton.isSelected();
@@ -802,16 +801,16 @@ public class Controlador implements ActionListener, ListSelectionListener {
     }
 
     public void modificarProductora(){
-        if (!Util.comprobarCampoVacio(vista.campoNombreProd)) {
-            Util.lanzaAlertaVacio(vista.campoNombreProd);
-        } else if (Util.comprobarCombobox(vista.comboLocalizacion)) {
-            Util.lanzaAlertaCombo(vista.comboLocalizacion);
-        } else if (!Util.comprobarSpinner(vista.campoNumTrabajadores)) {
+        if (!util.comprobarCampoVacio(vista.campoNombreProd)) {
+            util.lanzaAlertaVacio(vista.campoNombreProd);
+        } else if (util.comprobarCombobox(vista.comboLocalizacion)) {
+            util.lanzaAlertaCombo(vista.comboLocalizacion);
+        } else if (!util.comprobarSpinner(vista.campoNumTrabajadores)) {
             JOptionPane.showMessageDialog(null, "El campo Trabajadores no puede ser menor que 0");
-        } else if (Util.campoVacioCalendario(vista.campoFechaFundacion)) {
-            Util.lanzaAlertaVacioCalendar(vista.campoFechaFundacion);
-        } else if (!Util.comprobarCampoVacio(vista.campoPropietario)) {
-            Util.lanzaAlertaVacio(vista.campoPropietario);
+        } else if (util.campoVacioCalendario(vista.campoFechaFundacion)) {
+            util.lanzaAlertaVacioCalendar(vista.campoFechaFundacion);
+        } else if (!util.comprobarCampoVacio(vista.campoPropietario)) {
+            util.lanzaAlertaVacio(vista.campoPropietario);
         } else {
             Productora prod = (Productora) vista.listaProductora.getSelectedValue();
             prod.setNombre(vista.campoNombreProd.getText());

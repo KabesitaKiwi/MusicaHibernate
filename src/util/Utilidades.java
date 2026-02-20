@@ -4,7 +4,7 @@ import com.github.lgooddatepicker.components.DatePicker;
 
 import javax.swing.*;
 
-public class Util {
+public class Utilidades {
     public static boolean comprobarCampoVacio (JTextField campo){
         return !campo.getText().isEmpty();
     }
